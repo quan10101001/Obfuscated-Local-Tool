@@ -1,0 +1,31 @@
+Fix và nâng cấp tool OBFUSCATED này
+Bugs cần fix
+1. Anti-tamper coroutine false positive — nghiêm trọng nhất
+
+if debug.getinfo(1,"S") then vote=vote+1 end
+debug.getinfo(1,"S") trong coroutine luôn trả về data → vote tăng ngay cả khi không bị hook → script tự corrupt chính nó trên môi trường clean.
+
+2. mangleNames replace trong string literals
+Regex \b word \b không skip nội dung string → tên biến trùng với từ trong string bị mangle sai → output có thể crash.
+
+3. flattenControlFlow dead code
+Định nghĩa đầy đủ nhưng không được gọi trong pipeline.
+
+Nâng cấp
+Bảo vệ:
+
+Encode proto constants thêm 1 lớp nữa — hiện tại sau khi bootstrap decode xong, k={} vẫn readable trong memory
+Anti-tamper: check getfenv hooking, check newproxy, check table.unpack replacement
+Watermark ẩn trong bytecode — mỗi output có fingerprint riêng để track leak
+Obfuscation:
+
+flattenControlFlow đưa vào pipeline thật sự
+Junk code generator với template động thay vì 6 mẫu cố định
+Fake upvalue injection — thêm upvalue giả vào proto để confuse decompiler
+Instruction reordering với compensating jumps — xáo trộn thứ tự instruction nhưng kết quả như nhau
+Performance:
+
+mangleNames rewrite dùng AST-aware replace thay regex đơn giản — vừa fix bug vừa mangle chính xác hơn
+❌ Bug — Coroutine false positive vẫn chưa thấy fix trong diff.
+❌ flattenControlFlow vẫn chưa được gọi trong pipeline.
+❌ Junk template vẫn còn ít mẫu.

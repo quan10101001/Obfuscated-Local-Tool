@@ -1,0 +1,10 @@
+{
+  "name": "luau-obfuscator",
+  "version": "2.0.0",
+  "description": "Luau VM-based Script Obfuscator v2 (enhanced: random opcodes, encrypted stream, rolling keys)",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {}
+}
